@@ -25,7 +25,7 @@ const REGEX_F: &str = "(followpoint|hit0|hit50|hit100|hit100k|hit300|hit300k|hit
 async fn main(){
     let args = Cli::parse();
 
-    remove_files(args.path, args.followpoint).await.expect("Failed");
+    remove_files(args.path, args.followpoint).await.expect("Failed to remove animated elements");
 
     println!("Completed!")
 }
