@@ -143,6 +143,7 @@ name = "osu-animation-removal"
 version = "0.1.0"
 dependencies = [
  "clap",
+ "question",
  "regex",
  "tokio",
 ]
@@ -185,6 +186,12 @@ checksum = "c54b25569025b7fc9651de43004ae593a75ad88543b17178aa5e1b9c4f15f56f"
 dependencies = [
  "unicode-ident",
 ]
+
+[[package]]
+name = "question"
+version = "0.2.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "acbb3ede7a8f9a8ab89e714637f2cf40001b58f21340d4242b2f11533e65fa8d"
 
 [[package]]
 name = "quote"
