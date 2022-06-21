@@ -42,16 +42,6 @@ struct Cli {
     pre_play_skip_number: u32,
 }
 
-struct Store {
-    path: String,
-    followpoint: bool,
-    hits: bool,
-    pre_followpoint_number: u32,
-    pre_hits_number: u32,
-    pre_menu_back_number: u32,
-    pre_play_skip_number: u32,
-}
-
 const REGEX: &str = "(hit0|hit50|hit100|hit100k|hit300|hit300k|hit300g|menu-back|play-skip|scorebar-colour)-.*(\\d+)";
 const REGEX_F: &str = "(followpoint|hit0|hit50|hit100|hit100k|hit300|hit300k|hit300g|menu-back|play-skip|scorebar-colour)-.*(\\d+)";
 const REGEX_H_O: &str = "(hit0|hit50|hit100|hit100k|hit300|hit300k|hit300g)-0.*";
@@ -66,22 +56,12 @@ async fn main() {
         exit(0);
     }
 
-    let s = Store {
-        path: args.path,
-        followpoint: args.followpoint,
-        hits: args.hits,
-        pre_followpoint_number: args.pre_followpoint_number,
-        pre_hits_number: args.pre_hits_number,
-        pre_menu_back_number: args.pre_menu_back_number,
-        pre_play_skip_number: args.pre_play_skip_number,
-    };
-
-    remove_files(s).await.expect("Failed to remove animated elements");
+    remove_files(args).await.expect("Failed to remove animated elements");
 
     println!("Completed!")
 }
 
-async fn remove_files(s: Store) -> Result<(), Error> {
+async fn remove_files(s: Cli) -> Result<(), Error> {
     let r: Regex;
     if !s.followpoint {
         r = Regex::new(REGEX).unwrap();
