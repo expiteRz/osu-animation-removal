@@ -42,10 +42,14 @@ struct Cli {
     pre_play_skip_number: u32,
 }
 
+// Used for finding all animated elements
 const REGEX: &str = "(hit0|hit50|hit100|hit100k|hit300|hit300k|hit300g|menu-back|play-skip|scorebar-colour)-.*(\\d+)";
 const REGEX_F: &str = "(followpoint|hit0|hit50|hit100|hit100k|hit300|hit300k|hit300g|menu-back|play-skip|scorebar-colour)-.*(\\d+)";
-const REGEX_H_O: &str = "(hit0|hit50|hit100|hit100k|hit300|hit300k|hit300g)-0.*";
-const REGEX_FORMAT: &str = "(hit0|hit50|hit100|hit100k|hit300|hit300k|hit300g)-{}.*";
+
+// Used for selecting specified frame of animated elements
+const REGEX_H_BASE: &str = "(hit0|hit50|hit100|hit100k|hit300|hit300k|hit300g)-{}.*";
+const REGEX_BACK_BASE: &str = "menu-mack-{}.*";
+const REGEX_NUMS: &str = r"-[0-9]";
 
 #[tokio::main]
 async fn main() {
@@ -69,7 +73,8 @@ async fn remove_files(s: Cli) -> Result<(), Error> {
         r = Regex::new(REGEX_F).unwrap();
     }
 
-    let r_h = Regex::new(REGEX_H_O).unwrap();
+    let r_h = Regex::new(REGEX_H_BASE.replace("{}", format!("{}", s.pre_hits_number).as_str()).as_str()).unwrap();
+    let r_num = Regex::new(REGEX_NUMS).unwrap();
 
     let dir = fs::read_dir(s.path).expect("Failed to read specified directory");
 
@@ -78,6 +83,7 @@ async fn remove_files(s: Cli) -> Result<(), Error> {
         if r.is_match(f.file_name().to_str().unwrap()) {
             if !s.hits {
                 if r_h.is_match(f.file_name().to_str().unwrap()) {
+                    fs::rename(f.path(), r_num.replace_all(f.path().to_str().unwrap(), "-0").to_string()/* dest path; must refactor */).expect("Failed to rename file as frame 0");
                     continue;
                 }
             }
