@@ -48,7 +48,10 @@ const REGEX_F: &str = "(followpoint|hit0|hit50|hit100|hit100k|hit300|hit300k|hit
 
 // Used for selecting specified frame of animated elements
 const REGEX_H_BASE: &str = "(hit0|hit50|hit100|hit100k|hit300|hit300k|hit300g)-{}.*";
+const REGEX_FOLLOW_BASE: &str = "followpoint-{}.*";
 const REGEX_BACK_BASE: &str = "menu-mack-{}.*";
+const REGEX_SKIP_BASE: &str = "play-skip-{}.*";
+const REGEX_BAR_CLR_BASE: &str = "scorebar-colour-{}.*";
 const REGEX_NUMS: &str = r"-[0-9]";
 
 #[tokio::main]
@@ -83,7 +86,7 @@ async fn remove_files(s: Cli) -> Result<(), Error> {
         if r.is_match(f.file_name().to_str().unwrap()) {
             if !s.hits {
                 if r_h.is_match(f.file_name().to_str().unwrap()) {
-                    fs::rename(f.path(), r_num.replace_all(f.path().to_str().unwrap(), "-0").to_string()/* dest path; must refactor */).expect("Failed to rename file as frame 0");
+                    fs::rename(f.path(), f.path().to_str().unwrap().replace(&s.pre_hits_number.to_string(),  "0")).expect("Failed to rename file as frame 0");
                     continue;
                 }
             }
