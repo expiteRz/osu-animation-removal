@@ -1,9 +1,9 @@
-use std::fmt::Error;
-use std::fs;
-use std::process::exit;
 use clap::Parser;
 use question::{Answer, Question};
 use regex::Regex;
+use std::fmt::Error;
+use std::fs;
+use std::process::exit;
 
 #[derive(Parser)]
 #[clap(name = "osu-animation-frame-removal")]
@@ -69,26 +69,24 @@ async fn main() {
 }
 
 async fn remove_files(s: Cli) -> Result<(), Error> {
-    let r: Regex;
-    if !s.followpoint {
-        r = Regex::new(REGEX).unwrap();
+    let r: Regex = if !s.followpoint {
+        Regex::new(REGEX).unwrap()
     } else {
-        r = Regex::new(REGEX_F).unwrap();
-    }
+        Regex::new(REGEX_F).unwrap()
+    };
 
-    let r_h = Regex::new(REGEX_H_BASE.replace("{}", format!("{}", s.pre_hits_number).as_str()).as_str()).unwrap();
-    let r_num = Regex::new(REGEX_NUMS).unwrap();
+    let r_h = Regex::new(&REGEX_H_BASE.replace("{}", &s.pre_hits_number.to_string())).unwrap();
+    // let r_num = Regex::new(REGEX_NUMS).unwrap();
 
     let dir = fs::read_dir(s.path).expect("Failed to read specified directory");
 
     for d in dir {
         let f = d.expect("Failed to read file in specified directory");
         if r.is_match(f.file_name().to_str().unwrap()) {
-            if !s.hits {
-                if r_h.is_match(f.file_name().to_str().unwrap()) {
-                    fs::rename(f.path(), f.path().to_str().unwrap().replace(&s.pre_hits_number.to_string(),  "0")).expect("Failed to rename file as frame 0");
-                    continue;
-                }
+            if !s.hits && r_h.is_match(f.file_name().to_str().unwrap()) {
+                fs::rename(f.path(), f.path().to_str().unwrap().replace(&s.pre_hits_number.to_string(), "0"))
+                    .expect("Failed to rename file as frame 0");
+                continue;
             }
             fs::remove_file(f.path().to_str().unwrap()).expect("Failed to remove file");
         }
@@ -98,12 +96,7 @@ async fn remove_files(s: Cli) -> Result<(), Error> {
 }
 
 fn attention_removal() -> bool {
-    let q = Question::new("Before proceeding, make sure non-animated element has been prepared.\nDo you want to continue?")
-        .confirm();
+    let q = Question::new("Before proceeding, make sure non-animated element has been prepared.\nDo you want to continue? (Y/N):").confirm();
 
-    match q {
-        Answer::YES => true,
-        Answer::NO => false,
-        _ => false
-    }
+    q == Answer::YES
 }
